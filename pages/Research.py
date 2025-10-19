@@ -75,14 +75,14 @@ def main():
             "name": "Genetic Algorithm",
             "application": "Route Optimization",
             "description": "Evolutionary algorithm for complex optimization problems",
-            "accuracy": "Optimal solutions in 89% of cases",
+            "accuracy": "89% success rate",
             "training_time": "Varies by problem size"
         },
         {
             "name": "K-Means Clustering",
             "application": "Warehouse Segmentation",
             "description": "Unsupervised learning for grouping similar warehouses",
-            "accuracy": "Silhouette score: 0.78",
+            "accuracy": "78% silhouette score",
             "training_time": "5 minutes"
         },
         {
@@ -101,13 +101,84 @@ def main():
     # Model Performance Visualization
     st.subheader("Model Performance Metrics")
     
-    models = [algo['name'] for algo in algorithms]
-    accuracy = [float(algo['accuracy'].replace('%', '')) for algo in algorithms if '%' in algo['accuracy']]
+    # Fixed: Extract numeric accuracy values safely
+    models_with_numeric_accuracy = []
+    accuracy_values = []
     
-    fig = px.bar(x=models[:len(accuracy)], y=accuracy, 
-                 title="Model Accuracy Comparison",
-                 labels={'x': 'Algorithm', 'y': 'Accuracy (%)'})
-    st.plotly_chart(fig, use_container_width=True)
+    for algo in algorithms:
+        accuracy_str = algo['accuracy']
+        # Extract numeric value from accuracy string
+        try:
+            # Remove % and extract first numeric value
+            clean_str = accuracy_str.replace('%', '').split()[0]
+            numeric_value = float(clean_str)
+            models_with_numeric_accuracy.append(algo['name'])
+            accuracy_values.append(numeric_value)
+        except (ValueError, IndexError):
+            # Skip algorithms without numeric accuracy
+            continue
+    
+    if models_with_numeric_accuracy and accuracy_values:
+        fig = px.bar(
+            x=models_with_numeric_accuracy, 
+            y=accuracy_values, 
+            title="Model Accuracy Comparison",
+            labels={'x': 'Algorithm', 'y': 'Accuracy (%)'},
+            color=accuracy_values,
+            color_continuous_scale='Viridis'
+        )
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("No numeric accuracy data available for visualization.")
+    
+    # Alternative visualization - Training Time Comparison
+    st.subheader("Training Time Comparison")
+    
+    # Extract training times
+    models_with_time = []
+    training_times = []
+    time_minutes = []
+    
+    for algo in algorithms:
+        time_str = algo['training_time']
+        if 'minute' in time_str.lower():
+            # Extract numeric value from time string
+            try:
+                time_value = float(''.join(filter(str.isdigit, time_str.split()[0])))
+                models_with_time.append(algo['name'])
+                training_times.append(time_str)
+                time_minutes.append(time_value)
+            except (ValueError, IndexError):
+                continue
+    
+    if models_with_time and time_minutes:
+        fig_time = px.bar(
+            x=models_with_time,
+            y=time_minutes,
+            title="Training Time Comparison (Minutes)",
+            labels={'x': 'Algorithm', 'y': 'Training Time (minutes)'},
+            color=time_minutes,
+            color_continuous_scale='Blues'
+        )
+        fig_time.update_layout(showlegend=False)
+        st.plotly_chart(fig_time, use_container_width=True)
+    
+    # Algorithm Performance Table with Metrics
+    st.subheader("📊 Detailed Algorithm Performance")
+    
+    performance_data = []
+    for algo in algorithms:
+        performance_data.append({
+            'Algorithm': algo['name'],
+            'Application': algo['application'],
+            'Accuracy': algo['accuracy'],
+            'Training Time': algo['training_time'],
+            'Description': algo['description']
+        })
+    
+    perf_df = pd.DataFrame(performance_data)
+    st.dataframe(perf_df, use_container_width=True)
     
     # Carbon Calculation Methodology
     st.header("🌍 Carbon Calculation Methodology")
@@ -139,6 +210,23 @@ def main():
     ```
     """)
     
+    # Emission Factors Visualization
+    st.subheader("📈 Emission Factors Comparison")
+    
+    emission_sources = ['Diesel Truck', 'Electric Vehicle', 'Rail Transport', 'Electricity', 'Natural Gas', 'Solar Energy']
+    emission_values = [2.68, 0.05, 0.022, 0.5, 1.89, 0.04]
+    units = ['kg CO₂/liter', 'kg CO₂/km', 'kg CO₂/ton-km', 'kg CO₂/kWh', 'kg CO₂/kWh', 'kg CO₂/kWh']
+    
+    fig_emissions = px.bar(
+        x=emission_sources,
+        y=emission_values,
+        title="Carbon Emission Factors by Source",
+        labels={'x': 'Emission Source', 'y': 'Emission Factor'},
+        text=units
+    )
+    fig_emissions.update_traces(textposition='outside')
+    st.plotly_chart(fig_emissions, use_container_width=True)
+    
     # Case Studies
     st.header("📊 Case Studies & Real-world Applications")
     
@@ -168,6 +256,33 @@ def main():
             st.write(f"**Challenge:** {case['challenge']}")
             st.write(f"**Solution:** {case['solution']}")
             st.write(f"**Results:** {case['results']}")
+    
+    # Results Visualization for Case Studies
+    st.subheader("Case Study Results Comparison")
+    
+    companies = [case['company'] for case in case_studies]
+    emission_reductions = [28, 35, 31]  # From case studies
+    cost_savings = [2.3, 0, 0]  # Only first case study has monetary savings
+    
+    fig_results = go.Figure()
+    fig_results.add_trace(go.Bar(
+        name='Emission Reduction (%)',
+        x=companies,
+        y=emission_reductions,
+        marker_color='green'
+    ))
+    fig_results.add_trace(go.Bar(
+        name='Cost Savings ($M)',
+        x=companies,
+        y=cost_savings,
+        marker_color='blue'
+    ))
+    
+    fig_results.update_layout(
+        title="Case Study Results: Emission Reduction & Cost Savings",
+        barmode='group'
+    )
+    st.plotly_chart(fig_results, use_container_width=True)
     
     # Future Research Directions
     st.header("🔭 Future Research Directions")

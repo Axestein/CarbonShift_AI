@@ -62,6 +62,9 @@ def main():
             # Generate optimization report
             report = warehouse_optimizer.generate_optimization_report(warehouse_df)
             
+            # Get the clustered dataframe
+            df_clustered, _ = warehouse_optimizer.optimize_warehouse_clusters(warehouse_df)
+            
             # Display overall metrics
             st.subheader("🌍 Overall Optimization Potential")
             
@@ -113,12 +116,12 @@ def main():
             cluster_df = pd.DataFrame(cluster_data)
             st.dataframe(cluster_df)
             
-            # Visualization of clusters
+            # Visualization of clusters - FIXED LINE
             fig_clusters = px.scatter(
-                warehouse_df,
+                df_clustered,  # Use the clustered dataframe instead of original
                 x='energy_consumption_kwh',
                 y='inventory_turnover',
-                color=report['warehouse_savings'][0]['cluster'] if report['warehouse_savings'] else 'location',
+                color='cluster',  # Use the cluster column from clustered dataframe
                 size='square_meters',
                 hover_data=['location', 'energy_source'],
                 title='Warehouse Clusters: Energy vs Turnover'
@@ -133,7 +136,10 @@ def main():
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        st.metric("Current Energy", f"{warehouse_df[warehouse_df['location'] == savings['location']]['energy_consumption_kwh'].iloc[0]:,.0f} kWh")
+                        # Get current energy safely
+                        current_energy = warehouse_df[warehouse_df['location'] == savings['location']]['energy_consumption_kwh']
+                        if not current_energy.empty:
+                            st.metric("Current Energy", f"{current_energy.iloc[0]:,.0f} kWh")
                         st.metric("Potential Savings", f"{savings['total_savings_kwh']:.0f} kWh")
                     
                     with col2:

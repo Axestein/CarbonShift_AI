@@ -74,7 +74,7 @@ CarbonShift AI leverages artificial intelligence and machine learning to optimiz
 ## 📸 Demo
 
 ### Live Demo
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app-url.streamlit.app)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://carbonshift-ai.streamlit.app/)
 
 ### Screenshots
 

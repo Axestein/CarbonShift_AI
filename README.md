@@ -1,4 +1,4 @@
-# 🌱 CarbonShift AI - AI-Driven Carbon Footprint Reduction
+# 🌱 CarbonShift AI - AI-Driven Carbon Footprint Reduction in Supply Chain Management
 
 A comprehensive Streamlit application that demonstrates AI-powered approaches to reduce carbon footprint in supply chain management operations.
 

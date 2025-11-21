@@ -350,10 +350,6 @@ EXPOSE 8501
 CMD ["streamlit", "run", "app.py"]
 ```
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
 ### Development Setup
 
 1. Fork the repository
